@@ -3,7 +3,6 @@ node_js:
 - node
 before_script:
 - npm run build
-- npm run bundle
 cache:
   directories:
   - node_modules
