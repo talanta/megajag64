@@ -1,11 +1,15 @@
 /// <reference path="../../node_modules/phaser-ce/typescript/phaser.d.ts" />
 //Level management
 
-function renderWall(game:Phaser.Game, walls:Phaser.Group, item: string, i: number, j: number){
-  if (item !== 'x') { return;}
-  const wall = game.add.sprite(20 * j, 20 * i, 'exit');
-  walls.add(wall);
-  wall.body.immovable = true;
+function commonRender(check:string, 
+  game:Phaser.Game, 
+  group: Phaser.Group, 
+  item:string, 
+  i:number, j:number, immovable:boolean = false) {
+  if(item !== check){return;}
+  const block = game.add.sprite(20 * j, 20 * i, 'exit');
+  group.add(block);
+  block.body.immovable = true;
 }
 
 function renderEscalator(game:Phaser.Game, 
@@ -16,10 +20,11 @@ function renderEscalator(game:Phaser.Game,
   j: number): Number {
 
   if (item !== 'y') { return;}
-  let velocity:Number = 0;
+
   const escalator = game.add.sprite(20 * j, 20 * i, 'wall');
   escalators.add(escalator);
   escalator.body.immovable = true;
+    let velocity:Number = 0;
   if(last && last.item === 'y'){
      velocity = last.velocity;
   }
@@ -35,21 +40,21 @@ function renderEscalator(game:Phaser.Game,
   return velocity;
 }
 
-export default function levelRenderer(game : Phaser.Game, walls : Phaser.Group, escalators: Phaser.Group, lava: any, exits:any, level : any) {
+export default function levelRenderer(game : Phaser.Game, 
+  walls : Phaser.Group, 
+  escalators: Phaser.Group, 
+  lava: Phaser.Group, 
+  exits: Phaser.Group, 
+  level : any) {
   
-  var velocity = 0;
   level.reduce((result : any, line : string, i : number) => {
     line.split('').reduce((last, item, j) => {
-      renderWall(game, walls, item, i, j);
+
+      commonRender('x', game, walls, item, i, j, true);
+      commonRender('v', game, lava, item, i, j);
+      commonRender('e', game, exits, item, i, j);
+
       const velocity = renderEscalator(game, escalators, <{item:string,velocity:number}>last, item, i,j);
-        if(item === 'v') {
-        const lav = game.add.sprite(20 * j, 20 * i, 'exit');
-        lava.add(lav);
-      }
-      if(item === 'e') {
-        const lav = game.add.sprite(20 * j, 20 * i, 'exit');
-        exits.add(lav);
-      }
       
       return {item, velocity}
     }, {})

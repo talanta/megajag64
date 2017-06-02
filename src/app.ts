@@ -148,39 +148,26 @@ class GameState {
     game.world.enableBody = true;
    
     // Create the player in the middle of the game
-   this.player = game.add.sprite(70, 400, 'player');
-  this.player.animations.add('runright',[0,1,2,3]);
-
-            this.player
-      .animations
-      .add('jump',[10,11]);
-
-    this.player
-      .animations
-      .add('idle',[8,9]);
-
-    this.player
-      .animations
-      .play('idle', 4, true);
-
-   this.player.body.gravity.y = 600;
+    this.player = game.add.sprite(70, 400, 'player');
+    this.player.animations.add('runright',[0,1,2,3]);
+    this.player.animations.add('jump',[10,11]);
+    this.player.animations.add('idle',[8,9]);
+    this.player.play('idle', 4, true);
+    this.player.body.gravity.y = 600;
     //groups
-    this.walls = game
-      .add
-      .group();
-
+   
+    this.walls = game.add.group();
     this.escalator = game.add.group();
     this.lava = game.add.group();
     this.exits = game.add.group();
 
     levelRenderer(game, this.walls, this.escalator,this.lava, this.exits, levels.level01);
     //0 = right
-   this.direction = 0;
+    this.direction = 0;
 
-   this.music = game.add.audio('lvl1',1,true);
+    this.music = game.add.audio('lvl1',1,true);
    
     this.music.play();
-    //this.goToLevel2();
   }
 
   bossText()
@@ -201,19 +188,18 @@ class GameState {
     this.text.strokeThickness = 6;
     this.text.fill = '#FFFFFF';
   }
-  bossTextKill()
-  {
+  bossTextKill() {
     this.text.kill();
   }
 
   toggleDirection() {
-          this.player.anchor.setTo(.5,.5);
-         this.player.scale.x *= -1;
+    this.player.anchor.setTo(.5,.5);
+    this.player.scale.x *= -1;
   }
 
   death() {
     this.player.body.x = 70;
-        this.player.body.y = 400;
+    this.player.body.y = 400;
   }
 
   goToLevel2() {
@@ -302,16 +288,14 @@ class GameState {
        //Intro screen
        if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
        {
-
-          game.sound.stopAll();
-          this.introscreen.kill();
-       this.launchgame();
+        game.sound.stopAll();
+        this.introscreen.kill();
+        this.launchgame();
 
         this.gamelaunched = true;
        }
      }
 }
-       
 
   render() {
     if(this.gamelaunched)
@@ -320,19 +304,10 @@ class GameState {
      //   game.debug.body(this.boss);
      }
   }
-
-  
-
-
 }
 
-var game = new Phaser.Game(1200, 800);
-
+const game = new Phaser.Game(1200, 800);
 // Add the 'mainState' and call it 'main'
-game
-  .state
-  .add('main', new GameState());
+game.state.add('main', new GameState());
 // Start the state to actually start the game
-game
-  .state
-  .start('main');
+game.state.start('main');
