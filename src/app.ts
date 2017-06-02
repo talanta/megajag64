@@ -1,6 +1,9 @@
-/// <reference path="../node_modules/phaser/typescript/phaser.d.ts" />
+/// <reference path="../node_modules/phaser-ce/typescript/phaser.d.ts" />
+/// <reference path="../node_modules/phaser-ce/typescript/pixi.d.ts" />
 
-import * as phaser from 'phaser';
+import 'p2';
+import 'pixi.js';
+import * as phaser from 'phaser-ce';
 
 
 //Level management
@@ -133,6 +136,7 @@ const levels = {
     ' x                        x                               x',
     ' x                 yyyyy  x                               x',
     ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxvvvvvvvvvxxxxxxxxxxxxxxxx'
+
   ]
 }
 

@@ -1,14 +1,14 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin =  require('copy-webpack-plugin');
+const webpack = require('webpack');
 const path = require('path');
-var phaserModule = path.join(__dirname, '/node_modules/phaser/');
+var phaserModule = path.join(__dirname, '/node_modules/phaser-ce/');
 var phaser = path.join(phaserModule, 'build/custom/phaser-split.js'),
   pixi = path.join(phaserModule, 'build/custom/pixi.js'),
   p2 = path.join(phaserModule, 'build/custom/p2.js');
 
 module.exports = {
-  entry: { app : [ 
-    './src/app.js'
-    ]},
+  entry: { app : [pixi, p2, phaser, './src/app.ts']},
   output: {
     path: __dirname + '/dist',
     filename: 'bundle.js'
@@ -21,13 +21,13 @@ module.exports = {
         exclude: /node_modules/
       },
       { test: /\.(jpe?g|png|gif|svg)$/, loader: 'file-loader' },
-      { test: /pixi\.js/, loader: 'expose?PIXI' },
-      { test: /phaser-split\.js$/, loader: 'expose?Phaser' },
-      { test: /p2\.js/, loader: 'expose?p2' },
+      { test: /pixi\.js/, loader: 'expose-loader?PIXI' },
+      { test: /phaser-split\.js$/, loader: 'expose-loader?Phaser' },
+      { test: /p2\.js/, loader: 'expose-loader?p2' },
     ]
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+    extensions: [".tsx", ".ts", ".js", ".jpg", "png"],
     alias: {
       'phaser': phaser,
       'pixi.js': pixi,
@@ -37,6 +37,13 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({title: 'MEGA JAG64', 
       // favicon: 'src/favicon.ico', 
-      hash: true, template: 'src/index.html'})
+      hash: true, template: 'src/index.html'
+    }),
+      new CopyWebpackPlugin([
+        { context:'src', from: 'assets/**/*' },
+      ]),
+      new webpack.HotModuleReplacementPlugin(),
+          new webpack.NoEmitOnErrorsPlugin()
+
   ]
 };
