@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+- node
+before_script:
+- npm run build
+- npm run bundle
+cache:
+  directories:
+  - node_modules
+deploy:
+  provider: s3
+  access_key_id: AKIAJY2WOKMIE4NX6B2A
+  secret_access_key:
+    secure: 2pvwSU2fgNG9hz46O2i4LW1mkXFI2Aw6MyczT1VEstTkaFR9G4Ia6IxbJvMHd9axNH1s90MhckPHpZeql3NB+HvrZiI434TLEQWAAm631n91Rg+RGu/G3Vvcs4vlu8Li9uH01eZrJ636JeYgFKVEA4aHrbIMZF1d++jYzKciliVAqyHlK4lkrCDsGNof9Ca4p/LPx2/nsEvsaG3nCU7u6CM//viEIcGtKJS+HSpRM03aOQKZaCe5AlgwrsbOyQKNHjnEdYSVyM1y5EMpMSJ2YWk/wx341B+iQQpOOPqFOR4S2J4eTb7KN8+iQ3RCHVdbRYm15dmtXfwmibbX39X9jqlS5HuP5bLBic+mUvJv/w+SQZhUiMy+8CmxmCut60qvuj0XR0gu+GMLbNRB7tBTjhRcbztV24vSDv60rn7T8GLjdmbY4LCAwZ47JYrofWZtgWmK0P63lnmWYjBjaZMwO0BUBG5MKol22D6ouPsG5w0l4kQXOtM6TrkOK2OJS+qA8AH02PKf5+Ns13n3eIY2B8RYD/BVw1uiGM+foGQbB4Jd62Zn6LsvRV/ZcR3KKEihuI97asKu83cmGc57rgJ/e4dGu9zEQOJBy1tbIEHbBBztAR3Jru+cnLJmZc8Xa3qfxYkKWiNItBu4RC+mQg+kgqjItGv6Fjf7/XBPdJlkbHE=
+  bucket: megajag64
+  local-dir: dist
+  acl: ''
+  on:
+    repo: talanta/megajag64
