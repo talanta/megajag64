@@ -69,7 +69,7 @@ class GameState {
       .load
       .spritesheet('drone', 'assets/Drone.png', 72, 74);
 
-
+      game.load.image('lvl1bg', 'assets/LEVEL01.png');
     game
       .load
       .image('wall', 'assets/wall.png');
@@ -165,6 +165,7 @@ class GameState {
   }
 
    launchgame () {
+     game.add.image(game.world.centerX, game.world.centerY, 'lvl1bg').anchor.set(0.5);
     // Set the background color to blue
     this.currentLevel = 0;
     game.stage.backgroundColor = '#3598db';
@@ -212,9 +213,9 @@ class GameState {
    this.direction = 0;
 
    this.music = game.add.audio('lvl1',1,true);
-
+   
     this.music.play();
-    this.goToLevel2();
+    //this.goToLevel2();
   }
 
   bossText()
@@ -331,6 +332,7 @@ class GameState {
        //Intro screen
        if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
        {
+
           game.sound.stopAll();
           this.introscreen.kill();
        this.launchgame();
@@ -339,7 +341,7 @@ class GameState {
        }
      }
 }
-  
+       
 
   render() {
     if(this.gamelaunched)

@@ -9,7 +9,7 @@ export default function levelRenderer(game : any, walls : any, escalators: any, 
         if (item === 'x') {
           const wall = game
             .add
-            .sprite(20 * j, 20 * i, 'wall');
+            .sprite(20 * j, 20 * i, 'exit');
 
           walls.add(wall);
           wall.body.immovable = true;
@@ -35,7 +35,7 @@ export default function levelRenderer(game : any, walls : any, escalators: any, 
           escalator.body.bounce.set(1);
         }
          if(item === 'v') {
-          const lav = game.add.sprite(20 * j, 20 * i, 'lava');
+          const lav = game.add.sprite(20 * j, 20 * i, 'exit');
           lava.add(lav);
         }
         if(item === 'e') {
