@@ -4,144 +4,36 @@
 import 'p2';
 import 'pixi.js';
 import * as phaser from 'phaser-ce';
-
-
-//Level management
-function levelRenderer(game : any, walls : any, escalators: any, lava: any, exits:any, level : any) {
-  var lastItem = '';
-  var velocity = 0;
-  level.reduce((result : any, line : string, i : number) => {
-    line
-      .split('')
-      .reduce((res, item, j) => {
-        if (item === 'x') {
-          const wall = game
-            .add
-            .sprite(20 * j, 20 * i, 'wall');
-
-          walls.add(wall);
-          wall.body.immovable = true;
-        }
-        if(item === 'y') {
-          const escalator = game.add.sprite(20 * j, 20 * i, 'wall');
-          escalators.add(escalator);
-          escalator.body.immovable = true;
-          if(lastItem === 'y')
-          {
-              escalator.body.velocity.setTo(0,velocity);
-          }
-          else {
-            velocity = Math.floor((Math.random() * 100) + 100);
-            escalator.body.velocity.setTo(0,velocity);
-          }
-          
-          //  This makes the game world bounce-able
-          escalator.body.collideWorldBounds = true;
-          
-          //  This sets the image bounce energy for the horizontal 
-          //  and vertical vectors. "1" is 100% energy return
-          escalator.body.bounce.set(1);
-        }
-         if(item === 'v') {
-          const lav = game.add.sprite(20 * j, 20 * i, 'lava');
-          lava.add(lav);
-        }
-        if(item === 'e') {
-          const lav = game.add.sprite(20 * j, 20 * i, 'exit');
-          exits.add(lav);
-        }
-        lastItem = item;
-        return ''
-      })
-  })
-}
-
-const levels = {
-  level01: [
-    '',
-    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeex',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                      yyx',
-    ' x                                                  xxxxxxx',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                        v                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                xxxxxxxxxxxxxxxx',
-    ' x                        x                               x',
-    ' x          yyyy          x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x       yyyyyyyy                x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                 yyyyy  x                               x',
-    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxvvvvvvvvvxxxxxxxxxxxxxxxx'
-  ],
-  level02: [
-    '',
-    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeex',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                      yyx',
-    ' x                                                  xxxxxxx',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                        v                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                xxxxxxxxxxxxxxxx',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x       yyyyyyyy                x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                        x                               x',
-    ' x                 yyyyy  x                               x',
-    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxvvvvvvvvvxxxxxxxxxxxxxxxx'
-
-  ]
-}
+import levels from './levels/index'
+import levelRenderer from './rendering/levelRenderer'
 
 //End level management
 
+class Drone {
+  packages:any;
+  drone:any;
+  init() {
+    this.drone = game.add.sprite(100, 100, 'drone');
+    this.drone
+      .animations
+      .add('idle',[0,1]);
+    this.packages = game.add.group();
+    this.drone.animations.play('idle', 2, false);
+    this.drone.body.velocity.setTo(-100,0);
+    this.Timer();
+  }
+    Timer() {
+    game.time.events.add(Phaser.Timer.SECOND * 2, this.BossFire, this);
+  }
+
+  BossFire() {
+    var fireball = game.add.sprite(this.drone.body.x, this.drone.body.y+90, 'fireball');
+    this.packages.add(fireball);
+    fireball.body.velocity.y = 500;
+      this.Timer();
+    }
+
+}
 
 //Game Management
 class GameState {
@@ -155,15 +47,35 @@ class GameState {
   music:any;
   introscreen:any;
   exits:any;
+  fireball:any;
+  boss:any;
+  text:any;
+  bossHP:number;
+  currentLevel:number;
+  bossFireballs:any;
+  drone:Drone;
 
   preload() {
     // Load the bird sprite
     game
       .load
       .spritesheet('player', 'assets/jagsprite.png', 72, 72);
+
+      game
+      .load
+      .spritesheet('boss', 'assets/Boss.png', 89, 148);
+
+      game
+      .load
+      .spritesheet('drone', 'assets/Drone.png', 72, 74);
+
+
     game
       .load
       .image('wall', 'assets/wall.png');
+    game
+      .load
+      .image('fireball', 'assets/fireball.png');
     game.load.image('introscreen', 'assets/intro.png');
 
           game
@@ -187,9 +99,74 @@ class GameState {
     this.introscreen = game.add.sprite(0,0,'introscreen');
   }
 
+  playerFire() {
+    if(this.fireball === undefined || this.fireball !== undefined  && (this.fireball.body.x >= 1200 || this.fireball.body.x < 1) || this.fireball !== undefined  && !this.fireball.exists )
+    {
+    if(this.direction === 0) {
+      this.fireball = game.add.sprite(this.player.body.x+50, this.player.body.y+30, 'fireball');
+      this.fireball.body.velocity.x = 1000;
+    } else {
+      this.fireball = game.add.sprite(this.player.body.x, this.player.body.y+30, 'fireball');
+      this.fireball.body.velocity.x = -1000;
+    }
+    }
+  }
+
+  initBoss() {
+    this.bossText();
+    this.boss = game.add.sprite(900, 550, 'boss');
+    var anim = this.boss
+      .animations
+      .add('appear',[0,1,2,3]);
+      anim.onComplete.add(this.BossReady, this);
+    this.boss
+      .animations
+      .add('death',[6,7]);
+    this.boss.animations.add('fire', [4,5]);
+    this.boss.animations.play('appear', 2, false);
+    this.bossHP = 3;
+    this.boss.body.gravity.y = 600;
+    this.bossFireballs = game.add.group();
+  }
+
+  BossReady() {
+    this.boss.animations.play('fire', 2, true);
+    this.bossTextKill();
+    this.BossTimer();
+    
+  }
+
+  BossTimer() {
+    game.time.events.add(Phaser.Timer.SECOND * 1, this.BossFire, this);
+  }
+
+  BossFire() {
+    var fireball = game.add.sprite(this.boss.body.x, this.boss.body.y+90, 'fireball');
+    this.bossFireballs.add(fireball);
+    fireball.body.velocity.x = -1000;
+    if(this.bossHP !== 0)
+    {
+      this.BossTimer();
+      if(this.boss.body.touching.down)
+      this.boss.body.velocity.y = -Math.floor((Math.random() * 1000) + 10);
+    }
+  }
+
+  bossHit() {
+    this.bossHP = this.bossHP - 1;
+    this.fireball.kill();
+    if(this.bossHP === 0)
+      this.bossDie();
+  }
+
+  bossDie(){
+    this.boss.animations.stop();
+    this.boss.animations.play('death', 2, false);
+  }
+
    launchgame () {
     // Set the background color to blue
-    
+    this.currentLevel = 0;
     game.stage.backgroundColor = '#3598db';
     // Start the Arcade physics system (for movements and collisions)
     game
@@ -237,6 +214,30 @@ class GameState {
    this.music = game.add.audio('lvl1',1,true);
 
     this.music.play();
+    this.goToLevel2();
+  }
+
+  bossText()
+  {
+    this.text = game.add.text(800, 500, 'AHAH NOTHING CAN STOP SHOWROOM! THIS IS MINE!', null);
+
+    //	Center align
+    this.text.anchor.set(0.5);
+    this.text.align = 'center';
+
+    //	Font style
+    this.text.font = 'Arial Black';
+    this.text.fontSize = 20;
+    this.text.fontWeight = 'bold';
+
+    //	Stroke color and thickness
+    this.text.stroke = '#000000';
+    this.text.strokeThickness = 6;
+    this.text.fill = '#FFFFFF';
+  }
+  bossTextKill()
+  {
+    this.text.kill();
   }
 
   toggleDirection() {
@@ -250,6 +251,7 @@ class GameState {
   }
 
   goToLevel2() {
+    this.currentLevel = 1;
     this.escalator.removeAll();
     this.walls.removeAll();
     this.lava.removeAll();
@@ -258,11 +260,21 @@ class GameState {
     this.player.body.x = 70;
     this.player.body.y = 700;
     this.player.body.velocity.y = -1000;
+    this.initBoss();
   }
 
    update () {
      if(this.gamelaunched)
      {
+       //this.drone = new Drone();
+       //this.drone.init();
+       if(this.currentLevel === 1)
+       {
+         game.physics.arcade.collide(this.boss, this.walls);
+          //boss colision
+          game.physics.arcade.overlap(this.fireball, this.boss, this.bossHit, null, this);
+
+       }
           game.physics.arcade.collide(this.player, this.walls);
            game.physics.arcade.overlap(this.player, this.exits, this.goToLevel2, null, this);
           game.physics.arcade.overlap(this.player, this.lava, this.death, null, this);
@@ -300,6 +312,9 @@ class GameState {
               this.player.animations.play('idle', 4, true);
           }
 
+          if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
+            this.playerFire();
+
       // Make the player jump if he is touching the ground 
       if (this.cursor.up.isDown && this.player.body.touching.down) 
           this.player.body.velocity.y = -250;
@@ -329,8 +344,8 @@ class GameState {
   render() {
     if(this.gamelaunched)
      {
-    //game.debug.bodyInfo(this.player, 32, 32);
-    //    game.debug.body(this.player);
+    //game.debug.bodyInfo(this.boss, 32, 32);
+     //   game.debug.body(this.boss);
      }
   }
 
