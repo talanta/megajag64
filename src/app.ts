@@ -54,6 +54,7 @@ class GameState {
   currentLevel:number;
   bossFireballs:any;
   drone:Drone;
+  background:any;
 
   preload() {
     // Load the bird sprite
@@ -70,6 +71,7 @@ class GameState {
       .spritesheet('drone', 'assets/Drone.png', 72, 74);
 
       game.load.image('lvl1bg', 'assets/LEVEL01.png');
+      game.load.image('lvl2bg', 'assets/LEVEL02.png');
     game
       .load
       .image('wall', 'assets/wall.png');
@@ -124,7 +126,7 @@ class GameState {
       .add('death',[6,7]);
     this.boss.animations.add('fire', [4,5]);
     this.boss.animations.play('appear', 2, false);
-    this.bossHP = 3;
+    this.bossHP = 15;
     this.boss.body.gravity.y = 600;
     this.bossFireballs = game.add.group();
   }
@@ -165,7 +167,8 @@ class GameState {
   }
 
    launchgame () {
-     game.add.image(game.world.centerX, game.world.centerY, 'lvl1bg').anchor.set(0.5);
+     this.background = game.add.image(game.world.centerX, game.world.centerY, 'lvl1bg');
+     this.background.anchor.set(0.5);
     // Set the background color to blue
     this.currentLevel = 0;
     game.stage.backgroundColor = '#3598db';
@@ -252,6 +255,11 @@ class GameState {
   }
 
   goToLevel2() {
+    var bgtile = game.add.image(game.world.centerX, game.world.centerY, 'lvl2bg');
+    bgtile.anchor.set(0.5);
+    
+    game.world.sendToBack(bgtile);
+    game.world.sendToBack(this.background);
     this.currentLevel = 1;
     this.escalator.removeAll();
     this.walls.removeAll();
