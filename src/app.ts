@@ -4,7 +4,9 @@ import * as phaser from 'phaser';
 
 
 //Level management
-function levelRenderer(game : any, walls : any, escalators: any, lava: any, level : any) {
+function levelRenderer(game : any, walls : any, escalators: any, lava: any, exits:any, level : any) {
+  var lastItem = '';
+  var velocity = 0;
   level.reduce((result : any, line : string, i : number) => {
     line
       .split('')
@@ -21,7 +23,14 @@ function levelRenderer(game : any, walls : any, escalators: any, lava: any, leve
           const escalator = game.add.sprite(20 * j, 20 * i, 'wall');
           escalators.add(escalator);
           escalator.body.immovable = true;
-              escalator.body.velocity.setTo(0,200);
+          if(lastItem === 'y')
+          {
+              escalator.body.velocity.setTo(0,velocity);
+          }
+          else {
+            velocity = Math.floor((Math.random() * 100) + 100);
+            escalator.body.velocity.setTo(0,velocity);
+          }
           
           //  This makes the game world bounce-able
           escalator.body.collideWorldBounds = true;
@@ -34,6 +43,11 @@ function levelRenderer(game : any, walls : any, escalators: any, lava: any, leve
           const lav = game.add.sprite(20 * j, 20 * i, 'lava');
           lava.add(lav);
         }
+        if(item === 'e') {
+          const lav = game.add.sprite(20 * j, 20 * i, 'exit');
+          exits.add(lav);
+        }
+        lastItem = item;
         return ''
       })
   })
@@ -42,8 +56,7 @@ function levelRenderer(game : any, walls : any, escalators: any, lava: any, leve
 const levels = {
   level01: [
     '',
-    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx    x',
-    ' x         x                                              x',
+    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeex',
     ' x                                                        x',
     ' x                                                        x',
     ' x                                                        x',
@@ -55,32 +68,72 @@ const levels = {
     ' x                                                        x',
     ' x                                                        x',
     ' x                                                        x',
+    ' x                                                      yyx',
     ' x                                                  xxxxxxx',
     ' x                                                        x',
     ' x                                                        x',
     ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                         xxxxxxxxxxxxxxxx',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                yyyyyyyy                x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x                                                        x',
-    ' x         x    x                                         x',
+    ' x                        v                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                xxxxxxxxxxxxxxxx',
+    ' x                        x                               x',
+    ' x          yyyy          x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x       yyyyyyyy                x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                 yyyyy  x                               x',
     ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxvvvvvvvvvxxxxxxxxxxxxxxxx'
   ],
-  level02: []
+  level02: [
+    '',
+    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxeeeex',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                      yyx',
+    ' x                                                  xxxxxxx',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                                                        x',
+    ' x                        v                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                xxxxxxxxxxxxxxxx',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x       yyyyyyyy                x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                        x                               x',
+    ' x                 yyyyy  x                               x',
+    ' xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxvvvvvvvvvxxxxxxxxxxxxxxxx'
+  ]
 }
 
 //End level management
@@ -97,6 +150,7 @@ class GameState {
   gamelaunched:boolean;
   music:any;
   introscreen:any;
+  exits:any;
 
   preload() {
     // Load the bird sprite
@@ -111,6 +165,11 @@ class GameState {
           game
       .load
       .image('lava', 'assets/lava.png');
+
+      game
+      .load
+      .image('exit', 'assets/exit.png');
+
       game.load.audio('mscintro', 'assets/intro-final.mp3');
       game.load.audio('lvl1', 'assets/megajaglvl1.mp3');
   }
@@ -165,8 +224,9 @@ class GameState {
 
     this.escalator = game.add.group();
     this.lava = game.add.group();
+    this.exits = game.add.group();
 
-    levelRenderer(game, this.walls, this.escalator,this.lava, levels.level01);
+    levelRenderer(game, this.walls, this.escalator,this.lava, this.exits, levels.level01);
     //0 = right
    this.direction = 0;
 
@@ -185,14 +245,29 @@ class GameState {
         this.player.body.y = 400;
   }
 
+  goToLevel2() {
+    this.escalator.removeAll();
+    this.walls.removeAll();
+    this.lava.removeAll();
+    this.exits.removeAll();
+    levelRenderer(game, this.walls, this.escalator,this.lava, this.exits, levels.level02);
+    this.player.body.x = 70;
+    this.player.body.y = 700;
+    this.player.body.velocity.y = -1000;
+  }
+
    update () {
      if(this.gamelaunched)
      {
           game.physics.arcade.collide(this.player, this.walls);
-          game.physics.arcade.collide(this.player, this.escalator);
+           game.physics.arcade.overlap(this.player, this.exits, this.goToLevel2, null, this);
           game.physics.arcade.overlap(this.player, this.lava, this.death, null, this);
           game.physics.arcade.collide(this.escalator, this.walls)
-
+          this.escalator.forEach(function(item){
+            if(item.body.touching.down || item.body.touching.up)
+              item.body.velocity.y = - item.body.velocity.y;
+          });
+          game.physics.arcade.collide(this.player, this.escalator);
             if (this.cursor.left.isDown) 
             {
             
