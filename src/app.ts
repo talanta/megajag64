@@ -6,7 +6,7 @@ import 'pixi.js';
 import * as phaser from 'phaser-ce';
 import levels from './levels/index'
 import levelRenderer from './rendering/levelRenderer'
-
+import preloadFn from './game/preload'
 //End level management
 
 class Drone {
@@ -57,39 +57,7 @@ class GameState {
   background:any;
 
   preload() {
-    // Load the bird sprite
-    game
-      .load
-      .spritesheet('player', 'assets/jagsprite.png', 72, 72);
-
-      game
-      .load
-      .spritesheet('boss', 'assets/Boss.png', 89, 148);
-
-      game
-      .load
-      .spritesheet('drone', 'assets/Drone.png', 72, 74);
-
-      game.load.image('lvl1bg', 'assets/LEVEL01.png');
-      game.load.image('lvl2bg', 'assets/LEVEL02.png');
-    game
-      .load
-      .image('wall', 'assets/wall.png');
-    game
-      .load
-      .image('fireball', 'assets/fireball.png');
-    game.load.image('introscreen', 'assets/intro.png');
-
-          game
-      .load
-      .image('lava', 'assets/lava.png');
-
-      game
-      .load
-      .image('exit', 'assets/exit.png');
-
-      game.load.audio('mscintro', 'assets/intro-final.mp3');
-      game.load.audio('lvl1', 'assets/megajaglvl1.mp3');
+    preloadFn(game);
   }
 
   create() {
@@ -178,14 +146,10 @@ class GameState {
       .startSystem(Phaser.Physics.ARCADE);
     // Add the physics engine to all game objects
     game.world.enableBody = true;
-
    
     // Create the player in the middle of the game
    this.player = game.add.sprite(70, 400, 'player');
-
-    this.player
-      .animations
-      .add('runright',[0,1,2,3]);
+  this.player.animations.add('runright',[0,1,2,3]);
 
             this.player
       .animations
@@ -194,8 +158,6 @@ class GameState {
     this.player
       .animations
       .add('idle',[8,9]);
-
-
 
     this.player
       .animations
