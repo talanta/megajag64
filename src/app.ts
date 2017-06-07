@@ -115,7 +115,7 @@ class GameState {
     this.music = game.add.audio('lvl1',1,true);
    
     this.music.play();
-    this.goToLevel2();
+    //this.goToLevel2();
   }
 
   toggleDirection() {
