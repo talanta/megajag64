@@ -7,6 +7,7 @@ import * as phaser from 'phaser-ce';
 import levels from './levels/index'
 import levelRenderer from './rendering/levelRenderer'
 import preloadFn from './game/preload'
+import Boss from './characters/boss';
 //End level management
 
 class Drone {
@@ -47,14 +48,11 @@ class GameState {
   music:any;
   introscreen:any;
   exits:any;
-  fireball:any;
-  boss:any;
-  text:any;
-  bossHP:number;
+  fireball:Phaser.Sprite;
+  boss:Boss;
   currentLevel:number;
-  bossFireballs:any;
   drone:Drone;
-  background:any;
+  background:Phaser.Image;
 
   preload() {
     preloadFn(game);
@@ -82,61 +80,10 @@ class GameState {
     }
   }
 
-  initBoss() {
-    this.bossText();
-    this.boss = game.add.sprite(900, 550, 'boss');
-    var anim = this.boss
-      .animations
-      .add('appear',[0,1,2,3]);
-      anim.onComplete.add(this.BossReady, this);
-    this.boss
-      .animations
-      .add('death',[6,7]);
-    this.boss.animations.add('fire', [4,5]);
-    this.boss.animations.play('appear', 2, false);
-    this.bossHP = 15;
-    this.boss.body.gravity.y = 600;
-    this.bossFireballs = game.add.group();
-  }
-
-  BossReady() {
-    this.boss.animations.play('fire', 2, true);
-    this.bossTextKill();
-    this.BossTimer();
-    
-  }
-
-  BossTimer() {
-    game.time.events.add(Phaser.Timer.SECOND * 1, this.BossFire, this);
-  }
-
-  BossFire() {
-    var fireball = game.add.sprite(this.boss.body.x, this.boss.body.y+90, 'fireball');
-    this.bossFireballs.add(fireball);
-    fireball.body.velocity.x = -1000;
-    if(this.bossHP !== 0)
-    {
-      this.BossTimer();
-      if(this.boss.body.touching.down)
-      this.boss.body.velocity.y = -Math.floor((Math.random() * 1000) + 10);
-    }
-  }
-
-  bossHit() {
-    this.bossHP = this.bossHP - 1;
-    this.fireball.kill();
-    if(this.bossHP === 0)
-      this.bossDie();
-  }
-
-  bossDie(){
-    this.boss.animations.stop();
-    this.boss.animations.play('death', 2, false);
-  }
-
    launchgame () {
      this.background = game.add.image(game.world.centerX, game.world.centerY, 'lvl1bg');
      this.background.anchor.set(0.5);
+     this.background.cacheAsBitmap = true;
     // Set the background color to blue
     this.currentLevel = 0;
     game.stage.backgroundColor = '#3598db';
@@ -168,28 +115,7 @@ class GameState {
     this.music = game.add.audio('lvl1',1,true);
    
     this.music.play();
-  }
-
-  bossText()
-  {
-    this.text = game.add.text(800, 500, 'AHAH NOTHING CAN STOP SHOWROOM! THIS IS MINE!', null);
-
-    //	Center align
-    this.text.anchor.set(0.5);
-    this.text.align = 'center';
-
-    //	Font style
-    this.text.font = 'Arial Black';
-    this.text.fontSize = 20;
-    this.text.fontWeight = 'bold';
-
-    //	Stroke color and thickness
-    this.text.stroke = '#000000';
-    this.text.strokeThickness = 6;
-    this.text.fill = '#FFFFFF';
-  }
-  bossTextKill() {
-    this.text.kill();
+    this.goToLevel2();
   }
 
   toggleDirection() {
@@ -207,6 +133,7 @@ class GameState {
     bgtile.anchor.set(0.5);
     
     game.world.sendToBack(bgtile);
+    bgtile.cacheAsBitmap = true;
     game.world.sendToBack(this.background);
     this.currentLevel = 1;
     this.escalator.removeAll();
@@ -217,7 +144,8 @@ class GameState {
     this.player.body.x = 70;
     this.player.body.y = 700;
     this.player.body.velocity.y = -1000;
-    this.initBoss();
+    this.boss = new Boss(game);
+    this.boss.init();
   }
 
    update () {
@@ -227,9 +155,9 @@ class GameState {
        //this.drone.init();
        if(this.currentLevel === 1)
        {
-         game.physics.arcade.collide(this.boss, this.walls);
+         game.physics.arcade.collide(this.boss.sprite, this.walls);
           //boss colision
-          game.physics.arcade.overlap(this.fireball, this.boss, this.bossHit, null, this);
+          game.physics.arcade.overlap(this.fireball, this.boss.sprite, () => this.boss.hit(this.fireball), null, this.boss);
 
        }
           game.physics.arcade.collide(this.player, this.walls);
@@ -300,7 +228,7 @@ class GameState {
   render() {
     if(this.gamelaunched)
      {
-    //game.debug.bodyInfo(this.boss, 32, 32);
+     //game.debug.bodyInfo(this.boss, 32, 32);
      //   game.debug.body(this.boss);
      }
   }
