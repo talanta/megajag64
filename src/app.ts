@@ -202,7 +202,7 @@ class GameState {
 
       // Make the player jump if he is touching the ground 
       if (this.cursor.up.isDown && this.player.body.touching.down) 
-          this.player.body.velocity.y = -250;
+          this.player.body.velocity.y = -300;
           if(!this.player.body.touching.down)
             this.player.animations.play('jump', 4, true);
 
