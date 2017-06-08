@@ -9,6 +9,7 @@ class Boss {
     fireballs:any;
     sprite:Phaser.Sprite;
     text:SpeechBubble;
+    sfxappear:Phaser.Sound;
 
     constructor(game:any){
         this.game = game;
@@ -24,6 +25,8 @@ class Boss {
     this.sprite
       .animations
       .add('death',[6,7]);
+    this.sfxappear = this.game.add.audio('sfxbossappear');
+    this.sfxappear.play();
     this.sprite.animations.add('fire', [4,5]);
     this.sprite.animations.play('appear', 2, false);
     this.hitpoints = 15;
