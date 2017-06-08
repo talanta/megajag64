@@ -8,12 +8,14 @@ class SpeechBubble extends Phaser.Sprite {
     borders:any;
     tail:any;
     inverttail:boolean;
+    timeshown:number;
     
-    constructor(game:Phaser.Game, x:number, y:number, width:number, text:string, inverttail:boolean){
+    constructor(game:Phaser.Game, x:number, y:number, width:number, text:string, inverttail:boolean, timeshown?:number){
         super(game,x,y);
         this.width = width;
         this.text = text;
         this.inverttail = inverttail;
+        this.timeshown = timeshown;
     }
 
     draw () {
@@ -65,10 +67,16 @@ class SpeechBubble extends Phaser.Sprite {
         // Offset the position to be centered on the end of the tail
         this.pivot.set(this.x + 25, this.y + height + 24);
         this.game.world.add(this);
+        if(this.timeshown !== null)
+            this.timer();
     }
 
     undraw(){
         this.kill();
+    }
+
+    timer(){
+        this.game.time.events.add(Phaser.Timer.SECOND * this.timeshown, () => this.undraw(), this);
     }
 
     wrapBitmapText () {

@@ -4,37 +4,15 @@
 import 'p2';
 import 'pixi.js';
 import * as phaser from 'phaser-ce';
-import levels from './levels/index'
-import levelRenderer from './rendering/levelRenderer'
-import preloadFn from './game/preload'
+import levels from './levels/index';
+import levelRenderer from './rendering/levelRenderer';
+import preloadFn from './game/preload';
 import Boss from './characters/boss';
+import Drone from './characters/drone';
+import SpeechBubble from './util/speechbubble';
 //End level management
 
-class Drone {
-  packages:any;
-  drone:any;
-  init() {
-    this.drone = game.add.sprite(100, 100, 'drone');
-    this.drone
-      .animations
-      .add('idle',[0,1]);
-    this.packages = game.add.group();
-    this.drone.animations.play('idle', 2, false);
-    this.drone.body.velocity.setTo(-100,0);
-    this.Timer();
-  }
-    Timer() {
-    game.time.events.add(Phaser.Timer.SECOND * 2, this.BossFire, this);
-  }
 
-  BossFire() {
-    var fireball = game.add.sprite(this.drone.body.x, this.drone.body.y+90, 'fireball');
-    this.packages.add(fireball);
-    fireball.body.velocity.y = 500;
-      this.Timer();
-    }
-
-}
 
 //Game Management
 class GameState {
@@ -95,7 +73,7 @@ class GameState {
     game.world.enableBody = true;
    
     // Create the player in the middle of the game
-    this.player = game.add.sprite(70, 400, 'player');
+    this.player = game.add.sprite(70, 650, 'player');
     this.player.animations.add('runright',[0,1,2,3]);
     this.player.animations.add('jump',[10,11]);
     this.player.animations.add('idle',[8,9]);
@@ -111,9 +89,10 @@ class GameState {
     levelRenderer(game, this.walls, this.escalator,this.lava, this.exits, levels.level01);
     //0 = right
     this.direction = 0;
-
+    new SpeechBubble(game,120, 630,100, 'GO!', false, 1).draw();
     this.music = game.add.audio('lvl1',1,true);
-   
+    this.drone = new Drone(game, 200,200);
+    this.drone.init();
     this.music.play();
     //this.goToLevel2();
   }
@@ -129,6 +108,7 @@ class GameState {
   }
 
   goToLevel2() {
+    this.drone.kill();
     var bgtile = game.add.image(game.world.centerX, game.world.centerY, 'lvl2bg');
     bgtile.anchor.set(0.5);
     
@@ -159,6 +139,16 @@ class GameState {
           //boss colision
           game.physics.arcade.overlap(this.fireball, this.boss.sprite, () => this.boss.hit(this.fireball), null, this.boss);
 
+       }
+       if(this.currentLevel === 0){
+         //drone
+         game.physics.arcade.collide(this.drone, this.walls);
+         if(this.drone.body.velocity.x === 0)
+          this.drone.body.velocity.x = 50;
+         if(this.drone.body.touching.right)
+          this.drone.body.velocity.x = -50;
+          //shooting
+          game.physics.arcade.collide(this.drone.packages, this.player, this.death, null, this);
        }
           game.physics.arcade.collide(this.player, this.walls);
            game.physics.arcade.overlap(this.player, this.exits, this.goToLevel2, null, this);
@@ -228,8 +218,8 @@ class GameState {
   render() {
     if(this.gamelaunched)
      {
-     //game.debug.bodyInfo(this.boss, 32, 32);
-     //   game.debug.body(this.boss);
+      //game.debug.bodyInfo(this.drone, 32, 32);
+      //game.debug.body(this.drone);
      }
   }
 }

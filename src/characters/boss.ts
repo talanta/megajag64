@@ -1,7 +1,7 @@
 /// <reference path="../../node_modules/phaser-ce/typescript/phaser.d.ts" />
 import * as phaser from 'phaser-ce';
 
-import SpeechBubble from '../util/SpeechBubble'
+import SpeechBubble from '../util/speechbubble'
 
 class Boss {
     game:Phaser.Game;
@@ -14,7 +14,7 @@ class Boss {
         this.game = game;
     }
 
-    init() {
+  init() {
     this.introText();
     this.sprite = this.game.add.sprite(900, 550, 'boss');
     var anim = this.sprite
@@ -33,7 +33,6 @@ class Boss {
 
   Ready() {
     this.sprite.animations.play('fire', 2, true);
-    this.introTextKill();
     this.BossTimer();
     
   }
@@ -71,7 +70,7 @@ class Boss {
 
    introText()
   {
-      this.text = new SpeechBubble(this.game, 800,550,300, 'AHAH NOTHING CAN STOP SHOWROOM!', true);
+      this.text = new SpeechBubble(this.game, 800,550,300, 'AHAH NOTHING CAN STOP SHOWROOM!', true, 4);
       this.text.draw();
   }
 
