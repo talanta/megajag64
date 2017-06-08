@@ -59,7 +59,7 @@ class Boss {
         this.hitpoints = this.hitpoints - 1;
         fireball.kill();
         if(this.hitpoints <= 0)
-        this.die();
+          this.die();
       }
   }
 

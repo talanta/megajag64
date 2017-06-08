@@ -31,6 +31,7 @@ class GameState {
   currentLevel:number;
   drone:Drone;
   background:Phaser.Image;
+  sfxshoot: Phaser.Sound;
 
   preload() {
     preloadFn(game);
@@ -43,6 +44,7 @@ class GameState {
     this.gamelaunched = false;
     this.cursor = game.input.keyboard.createCursorKeys();
     this.introscreen = game.add.sprite(0,0,'introscreen');
+    this.sfxshoot = game.add.audio('sfxshoot');
   }
 
   playerFire() {
@@ -55,6 +57,7 @@ class GameState {
       this.fireball = game.add.sprite(this.player.body.x, this.player.body.y+30, 'fireball');
       this.fireball.body.velocity.x = -1000;
     }
+    this.sfxshoot.play();
     }
   }
 
@@ -90,7 +93,7 @@ class GameState {
     //0 = right
     this.direction = 0;
     new SpeechBubble(game,120, 630,100, 'GO!', false, 1).draw();
-    this.music = game.add.audio('lvl1',1,true);
+    this.music = game.add.audio('lvl1',0.7,true);
     this.drone = new Drone(game, 200,200);
     this.drone.init();
     this.music.play();
@@ -149,6 +152,7 @@ class GameState {
           this.drone.body.velocity.x = -50;
           //shooting
           game.physics.arcade.collide(this.drone.packages, this.player, this.death, null, this);
+          game.physics.arcade.overlap(this.fireball, this.drone, () => this.drone.kill(), null, this.drone);
        }
           game.physics.arcade.collide(this.player, this.walls);
            game.physics.arcade.overlap(this.player, this.exits, this.goToLevel2, null, this);

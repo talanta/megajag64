@@ -18,6 +18,8 @@ export default function preload(game: Phaser.Game) {
 
   game.load.audio('mscintro', 'assets/intro-final.mp3');
   game.load.audio('lvl1', 'assets/megajaglvl1.mp3');
+  game.load.audio('sfxdamage', 'assets/damage.mp3');
+  game.load.audio('sfxshoot', 'assets/shoot.mp3');
 
   game.load.spritesheet('bubble-border','assets/bubble-body.png',9,9);
   game.load.image('bubble-tail','assets/bubble-tail.png');

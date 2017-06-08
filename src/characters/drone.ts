@@ -5,6 +5,7 @@ import * as phaser from 'phaser-ce';
 class Drone extends Phaser.Sprite {
   packages:Phaser.Group;
   timer:Phaser.TimerEvent;
+  sfxdeath:Phaser.Sound;
 
   constructor(game:Phaser.Game, x:number, y:number) {
       super(game,x,y, 'drone');
@@ -17,6 +18,7 @@ class Drone extends Phaser.Sprite {
       this.animations.play('idle', 2, true);
       this.body.velocity.x = -50;
       this.scale.setTo(2,2);
+      this.sfxdeath = this.game.add.audio('sfxdamage',1);
       this.Timer();
   }
 
@@ -26,6 +28,7 @@ class Drone extends Phaser.Sprite {
 
   kill() {
       super.kill();
+      this.sfxdeath.play();
       return this;
   }
 
