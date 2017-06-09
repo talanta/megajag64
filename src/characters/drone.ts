@@ -33,11 +33,13 @@ class Drone extends Phaser.Sprite {
   }
 
   dropPackage() {
-    var fireball = this.game.add.sprite(this.body.x+16, this.body.y+56, 'fireball');
-    this.packages.add(fireball);
-    fireball.body.velocity.y = 500;
-    if(this.alive === true)
+    if(this.alive === true){
+        var fireball = this.game.add.sprite(this.body.x+16, this.body.y+56, 'fireball');
+        fireball.outOfBoundsKill = true;
+        this.packages.add(fireball);
+        fireball.body.velocity.y = 500;
         this.Timer();
+    }
   }
 }
 

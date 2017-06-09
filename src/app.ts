@@ -10,6 +10,8 @@ import preloadFn from './game/preload';
 import Boss from './characters/boss';
 import Drone from './characters/drone';
 import SpeechBubble from './util/speechbubble';
+import Package from './items/package';
+import winscreen from './game/winscreen';
 //End level management
 
 
@@ -32,6 +34,9 @@ class GameState {
   drone:Drone;
   background:Phaser.Image;
   sfxshoot: Phaser.Sound;
+  package:Package;
+  winscreen:Phaser.Image;
+  imageshown:number;
 
   preload() {
     preloadFn(game);
@@ -67,7 +72,7 @@ class GameState {
      this.background.cacheAsBitmap = true;
     // Set the background color to blue
     this.currentLevel = 0;
-    game.stage.backgroundColor = '#3598db';
+    game.stage.backgroundColor = '#000000';
     // Start the Arcade physics system (for movements and collisions)
     game
       .physics
@@ -129,6 +134,16 @@ class GameState {
     this.player.body.velocity.y = -1000;
     this.boss = new Boss(game);
     this.boss.init();
+    this.package = new Package(game,1000,650);
+    this.package.init();
+  }
+
+  endgame() {
+    this.package.kill();
+    game.world.removeChildren();
+    //game.add.tween(game.world).to({alpha : 0}, 10000, Phaser.Easing.Cubic.Out,true);
+    var win = new winscreen(game);
+    win.init();
   }
 
    update () {
@@ -141,6 +156,8 @@ class GameState {
          game.physics.arcade.collide(this.boss.sprite, this.walls);
           //boss colision
           game.physics.arcade.overlap(this.fireball, this.boss.sprite, () => this.boss.hit(this.fireball), null, this.boss);
+
+          game.physics.arcade.overlap(this.player, this.package, this.endgame, null, this);
 
        }
        if(this.currentLevel === 0){
